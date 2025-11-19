@@ -77,9 +77,7 @@
 
 ⚙️ Pengaturan
    ├─ Pengaturan Umum
-   ├─ Template Dokumen
    ├─ Notifikasi
-   ├─ Backup Database
    └─ Log Aktivitas
 
 🔔 Notifikasi
