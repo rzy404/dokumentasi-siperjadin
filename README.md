@@ -94,7 +94,7 @@ Pilihan Sekwan:
 
 ---
 
-## 🔄 ALUR KERJA SISTEM V3.0 FINAL
+## 🔄 ALUR KERJA SISTEM
 
 ### 1️⃣ TAHAP PERMOHONAN
 
