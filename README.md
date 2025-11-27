@@ -16,14 +16,17 @@
 
 ---
 
-## 👥 DAFTAR ROLE & FUNGSI
+## 👥 DAFTAR ROLE & FUNGSI (5 ROLES)
 
 ### 1. 👨‍💼 OPERATOR/ADMIN (Ketua Organisasi)
 **Fungsi:**
 - Membuat permohonan surat perjalanan dinas
 - Pilih anggota yang akan ditugaskan
 - Estimasi biaya perjalanan
-- Revisi permohonan jika diminta Sekwan
+- Revisi permohonan jika di-reject oleh Pimpinan atau Sekwan
+
+**Notifikasi:**
+- Terima **WhatsApp** jika permohonan di-reject
 
 ---
 
@@ -33,14 +36,24 @@
 - QR Code approval otomatis ter-generate
 - Monitoring seluruh perjalanan dinas DPRD
 
+**Notifikasi:**
+- **WhatsApp** (karena sudah ada servisnya)
+- Urgent approval request
+- Real-time notification
+
 ---
 
 ### 3. 📋 SEKWAN (Sekretaris Dewan)
 **Fungsi:**
-- Verifikasi anggaran (Level 2)
+- Verifikasi anggaran (Level 2 - FINAL!)
 - **PENTING:** Bisa kurangi jumlah pegawai jika anggaran tidak cukup
 - Atau minta operator revisi permohonan
 - QR Code approval otomatis ter-generate
+
+**Notifikasi:**
+- **In-App Push** (Laravel Notification)
+- Bell icon 🔔 dengan badge count
+- Part-time approval checking
 
 **Contoh Kasus:**
 ```
@@ -55,20 +68,15 @@ Pilihan Sekwan:
 
 ---
 
-### 4. 👨‍💼 KASUBAG (Kepala Sub Bagian)
+### 4. 📝 PENGELOLA
 **Fungsi:**
-- Approval administrasi (Level 3)
-- QR Code approval otomatis ter-generate
-- Koordinasi dengan Pengelola
-
----
-
-### 5. 📝 PENGELOLA
-**Fungsi:**
-- Generate dokumen (ST, SPPD) dengan QR Code
+- Generate dokumen (ST, SPPD) dengan **2 QR Code** (Pimpinan + Sekwan)
 - Printout berkas (optional, untuk arsip)
 - Monitoring kelengkapan dokumen pegawai
 - Arsip dokumen
+
+**Notifikasi:**
+- **WhatsApp** saat approval selesai
 
 **TIDAK LAGI:**
 - ❌ Input rincian biaya (pegawai yang upload kwitansi fisik)
@@ -76,9 +84,9 @@ Pilihan Sekwan:
 
 ---
 
-### 6. 👨‍💻 PEGAWAI
+### 5. 👨‍💻 PEGAWAI
 **Fungsi:**
-- Download ST & SPPD (PDF dengan QR Code)
+- Download ST & SPPD (PDF dengan **2 QR Code**)
 - Melaksanakan perjalanan dinas
 - **Upload foto kegiatan** (min 3)
 - **Upload kwitansi fisik** sebagai bukti pengeluaran:
@@ -88,13 +96,16 @@ Pilihan Sekwan:
   - Foto/scan kwitansi transport
   - Bukti pengeluaran lainnya
 
+**Notifikasi:**
+- **WhatsApp** untuk dokumen ready & reminder
+
 **TIDAK ADA:**
 - ❌ Input rincian biaya manual (cukup upload kwitansi fisik)
 - ❌ Buat kwitansi pencairan (tidak ada sistem pencairan)
 
 ---
 
-## 🔄 ALUR KERJA SISTEM
+## 🔄 ALUR KERJA SISTEM (2 LEVEL APPROVAL)
 
 ### 1️⃣ TAHAP PERMOHONAN
 
@@ -122,40 +133,47 @@ Pilihan Sekwan:
 └─────────────────────────────────────────────────────────┘
                           ↓
                    📱 NOTIFIKASI
-         (WhatsApp ke Pimpinan & Sekwan)
+              (WhatsApp ke Pimpinan)
 ```
 
 ---
 
-### 2️⃣ TAHAP APPROVAL MULTI-LEVEL (dengan QR Code)
+### 2️⃣ TAHAP APPROVAL 2 LEVEL (dengan QR Code)
 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ LEVEL 1: PIMPINAN (Ketua DPRD)                         │
+│ NOTIFIKASI: WhatsApp (Sudah Ada Servisnya)             │
 │                                                          │
+│ • Terima notifikasi WhatsApp:                           │
+│   "[SiPerjadin] Permohonan baru dari Komisi I"         │
 │ • Review permohonan                                      │
 │ • Cek kelayakan perjalanan dinas                        │
 │                                                          │
 │ APPROVE:                                                 │
-│ ✅ Sistem auto-generate QR Code Approval                │
+│ ✅ Sistem auto-generate QR Code Pimpinan                │
 │    QR Code berisi:                                       │
 │    - Nama & NIP Pimpinan                                │
 │    - Nomor surat permohonan                             │
 │    - Status: APPROVED                                    │
+│    - Level: 1                                            │
 │    - Timestamp approval                                  │
 │    - Hash untuk validasi                                 │
 │    - Link verifikasi                                     │
 │                                                          │
 │ REJECT:                                                  │
-│ ❌ Input alasan → Kembali ke Operator                   │
+│ ❌ Input alasan → WhatsApp ke Operator                  │
 └─────────────────────────────────────────────────────────┘
                           ↓
                    📱 NOTIFIKASI
-                (WhatsApp ke Sekwan)
+         (WhatsApp ke Sekwan - Informasi)
+         (In-App Push ke Sekwan - Action Required)
                           ↓
 ┌─────────────────────────────────────────────────────────┐
-│ LEVEL 2: SEKWAN (Sekretaris Dewan) - CRITICAL!         │
+│ LEVEL 2: SEKWAN (Sekretaris Dewan) - FINAL!            │
+│ NOTIFIKASI: In-App Push (Laravel Notification)          │
 │                                                          │
+│ • Terima notifikasi in-app (Bell icon 🔔)              │
 │ • Review permohonan                                      │
 │ • CEK ANGGARAN:                                         │
 │   - Estimasi biaya: Rp 15.000.000                      │
@@ -168,7 +186,7 @@ Pilihan Sekwan:
 │    ❌ Reject permohonan                                 │
 │    📝 Catatan: "Anggaran tidak cukup untuk 3 orang.    │
 │                 Mohon revisi jadi 2 orang"              │
-│    → Kembali ke Operator untuk revisi                   │
+│    → WhatsApp ke Operator untuk revisi                  │
 │                                                          │
 │ 🔹 OPSI 2: ADJUST JUMLAH PEGAWAI (RECOMMENDED)         │
 │    ✏️ Sekwan kurangi anggota dari 3 → 2 orang          │
@@ -177,9 +195,9 @@ Pilihan Sekwan:
 │       ☑️ Siti Nurhaliza (Anggota) - TETAP              │
 │       ☐ Andi Wijaya (Anggota) - DIBATALKAN             │
 │    💰 Estimasi biaya disesuaikan: Rp 10.000.000        │
-│    📱 Notifikasi ke Andi: "Penugasan dibatalkan"       │
-│    ✅ APPROVE dengan penyesuaian                        │
-│    → Generate QR Code Approval                          │
+│    📱 WhatsApp ke Andi: "Penugasan dibatalkan"         │
+│    ✅ APPROVE dengan penyesuaian (FINAL!)              │
+│    → Generate QR Code Sekwan                            │
 │    → Pencadangan anggaran otomatis                      │
 │                                                          │
 │ 🔹 OPSI 3: KONSULTASI                                   │
@@ -189,28 +207,12 @@ Pilihan Sekwan:
 └─────────────────────────────────────────────────────────┘
                           ↓
                    📱 NOTIFIKASI
-        (WhatsApp ke Kasubag & Pegawai yang dibatalkan)
-                          ↓
-┌─────────────────────────────────────────────────────────┐
-│ LEVEL 3: KASUBAG                                        │
-│                                                          │
-│ • Review kelengkapan administrasi                       │
-│ • Koordinasi dengan Pengelola                           │
-│                                                          │
-│ APPROVE:                                                 │
-│ ✅ Sistem auto-generate QR Code Approval                │
-│                                                          │
-│ REJECT:                                                  │
-│ ❌ Input alasan → Kembali ke Operator                   │
-└─────────────────────────────────────────────────────────┘
-                          ↓
-                   📱 NOTIFIKASI
-               (WhatsApp ke Pengelola)
+        (WhatsApp ke Pengelola & Pegawai dibatalkan)
 ```
 
 ---
 
-### 3️⃣ TAHAP GENERATE BERKAS (dengan QR Code)
+### 3️⃣ TAHAP GENERATE BERKAS (dengan 2 QR Code)
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -224,14 +226,14 @@ Pilihan Sekwan:
 │       • Berisi data perjalanan dinas                    │
 │       • Daftar pegawai yang berangkat: 2 orang         │
 │         (sudah disesuaikan Sekwan)                      │
-│       • Embedded 3 QR Code:                             │
-│         [QR Pimpinan] [QR Sekwan] [QR Kasubag]         │
+│       • Embedded 2 QR Code:                             │
+│         [QR Pimpinan] [QR Sekwan]                       │
 │       • QR Code = Bukti approval (bukan TTD)           │
 │                                                          │
 │    📄 SPPD                                              │
 │       • Berisi estimasi biaya yang sudah disesuaikan   │
 │       • Daftar pegawai: 2 orang                        │
-│       • Embedded 3 QR Code approval                     │
+│       • Embedded 2 QR Code approval                     │
 │                                                          │
 │    📄 Surat Penyampaian                                 │
 │       • Surat pengantar                                 │
@@ -249,7 +251,7 @@ Pilihan Sekwan:
 └─────────────────────────────────────────────────────────┘
                           ↓
               📱 NOTIFIKASI KE PEGAWAI
-         "Dokumen siap didownload dengan QR Code"
+         "Dokumen siap didownload dengan 2 QR Code"
 ```
 
 ---
@@ -261,7 +263,7 @@ Pilihan Sekwan:
 │ PEGAWAI (2 orang yang berangkat)                       │
 │                                                          │
 │ 1. DOWNLOAD DOKUMEN:                                    │
-│    • Download ST & SPPD (PDF dengan QR Code)           │
+│    • Download ST & SPPD (PDF dengan 2 QR Code)         │
 │    • Verifikasi QR Code (scan untuk cek keaslian)     │
 │                                                          │
 │ 2. MELAKSANAKAN PERJALANAN DINAS:                      │
@@ -357,7 +359,7 @@ Pilihan Sekwan:
 │      ✅ Kwitansi transport                              │
 │      ✅ Kwitansi akomodasi                              │
 │      ✅ Kwitansi makan                                  │
-│      ⚠️  Jika belum lengkap → Notif ke pegawai         │
+│      ⚠️  Jika belum lengkap → WhatsApp ke pegawai      │
 │                                                          │
 │ 2. REVIEW BUKTI:                                        │
 │    • View semua foto kwitansi                           │
@@ -368,11 +370,11 @@ Pilihan Sekwan:
 │ 3. VALIDASI:                                            │
 │    ✅ Approve: Jika semua lengkap & wajar              │
 │    ❌ Reject: Jika ada yang tidak sesuai               │
-│       → Notif ke pegawai untuk perbaiki                 │
+│       → WhatsApp ke pegawai untuk perbaiki              │
 │                                                          │
 │ 4. ARSIP DIGITAL:                                       │
 │    • Simpan semua dokumen                               │
-│    • ST & SPPD (dengan QR Code)                        │
+│    • ST & SPPD (dengan 2 QR Code)                      │
 │    • Foto kegiatan                                      │
 │    • Kwitansi fisik (foto/scan)                        │
 │    • Generate laporan realisasi anggaran                │
@@ -394,10 +396,10 @@ Pilihan Sekwan:
    ├─ Buat Permohonan Baru
    ├─ Daftar Permohonan
    ├─ Edit Permohonan (jika di-reject)
-   └─ Detail Permohonan & Status Approval
+   └─ Detail Permohonan & Status Approval (2 level)
 👥 Anggota Organisasi
 📊 Laporan
-🔔 Notifikasi
+🔔 Notifikasi (WhatsApp)
 👤 Profil
 ```
 
@@ -410,12 +412,12 @@ Pilihan Sekwan:
 ✅ Approval Level 1
    ├─ Daftar Permohonan Menunggu
    ├─ Review Detail Permohonan
-   ├─ APPROVE (auto-generate QR Code)
-   └─ REJECT (dengan alasan)
+   ├─ APPROVE (auto-generate QR Code Pimpinan)
+   └─ REJECT (dengan alasan → WhatsApp ke Operator)
 📄 Daftar Permohonan (semua)
 📊 Monitoring
-🔍 Verifikasi QR Code
-🔔 Notifikasi
+🔍 Verifikasi QR Code (2 QR: Pimpinan + Sekwan)
+🔔 Notifikasi (WhatsApp)
 👤 Profil
 ```
 
@@ -425,7 +427,7 @@ Pilihan Sekwan:
 
 ```
 🏠 Dashboard
-✅ Approval Level 2 (CRITICAL!)
+✅ Approval Level 2 (FINAL - CRITICAL!)
    ├─ Daftar Permohonan dari Pimpinan
    ├─ Review Permohonan
    ├─ CEK ANGGARAN:
@@ -435,7 +437,7 @@ Pilihan Sekwan:
    │  └─ Validasi: Cukup/Tidak
    │
    ├─ JIKA ANGGARAN CUKUP:
-   │  └─ APPROVE (auto-generate QR Code)
+   │  └─ APPROVE (auto-generate QR Code Sekwan - FINAL!)
    │
    ├─ JIKA ANGGARAN TIDAK CUKUP:
    │  ├─ OPSI 1: REJECT & MINTA REVISI
@@ -446,8 +448,8 @@ Pilihan Sekwan:
    │  │  ├─ Kurangi anggota yang berangkat
    │  │  ├─ Pilih pegawai yang tetap & dibatalkan
    │  │  ├─ Sistem adjust estimasi biaya
-   │  │  ├─ Notif ke pegawai yang dibatalkan
-   │  │  └─ APPROVE dengan penyesuaian
+   │  │  ├─ WhatsApp ke pegawai yang dibatalkan
+   │  │  └─ APPROVE dengan penyesuaian (FINAL!)
    │  │
    │  └─ OPSI 3: KONSULTASI OPERATOR
    │     └─ Chat/telpon untuk diskusi
@@ -458,38 +460,20 @@ Pilihan Sekwan:
    ├─ Realisasi Anggaran
    └─ Pencadangan Anggaran
 📊 Monitoring
-🔍 Verifikasi QR Code
-🔔 Notifikasi
+🔍 Verifikasi QR Code (2 QR: Pimpinan + Sekwan)
+🔔 Notifikasi (In-App Push - Bell Icon 🔔)
 👤 Profil
 ```
 
 ---
 
-### 4. 👨‍💼 KASUBAG
-
-```
-🏠 Dashboard
-✅ Approval Level 3
-   ├─ Daftar Permohonan dari Sekwan
-   ├─ Review Kelengkapan Administrasi
-   ├─ APPROVE (auto-generate QR Code)
-   └─ REJECT (dengan alasan)
-📄 Daftar Permohonan
-📊 Monitoring
-🔍 Verifikasi QR Code
-🔔 Notifikasi
-👤 Profil
-```
-
----
-
-### 5. 📝 PENGELOLA
+### 4. 📝 PENGELOLA
 
 ```
 🏠 Dashboard
 📄 Pengelolaan Berkas
-   ├─ Daftar Permohonan Approved
-   ├─ Generate Dokumen (ST, SPPD) dengan QR
+   ├─ Daftar Permohonan Approved (Level 1 + 2 - FINAL)
+   ├─ Generate Dokumen (ST, SPPD) dengan 2 QR Code
    ├─ Download PDF
    ├─ Printout (optional)
    └─ Status Berkas
@@ -510,19 +494,19 @@ Pilihan Sekwan:
       ├─ Validasi nominal
       └─ Approve/Reject
 📁 Arsip Digital
-   ├─ ST & SPPD (dengan QR)
+   ├─ ST & SPPD (dengan 2 QR Code)
    ├─ Foto Kegiatan
    ├─ Kwitansi Fisik
    └─ Laporan Realisasi
 📊 Laporan
-🔍 Verifikasi QR Code
-🔔 Notifikasi
+🔍 Verifikasi QR Code (2 QR: Pimpinan + Sekwan)
+🔔 Notifikasi (WhatsApp)
 👤 Profil
 ```
 
 ---
 
-### 6. 👨‍💻 PEGAWAI
+### 5. 👨‍💻 PEGAWAI
 
 ```
 🏠 Dashboard
@@ -531,12 +515,12 @@ Pilihan Sekwan:
 📋 Penugasan Saya
    ├─ Surat Tugas Aktif
    │  ├─ Detail ST
-   │  ├─ Download ST (PDF dengan QR Code)
+   │  ├─ Download ST (PDF dengan 2 QR Code)
    │  └─ Verifikasi QR Code
    │
    └─ SPPD Aktif
       ├─ Detail SPPD
-      ├─ Download SPPD (PDF dengan QR Code)
+      ├─ Download SPPD (PDF dengan 2 QR Code)
       └─ Verifikasi QR Code
 📸 Upload Foto Kegiatan
    ├─ Pilih Perjalanan Dinas
@@ -576,8 +560,8 @@ Pilihan Sekwan:
 📖 Riwayat
    ├─ Riwayat Perjalanan Dinas
    └─ Riwayat Upload Dokumen
-🔍 Verifikasi QR Code
-🔔 Notifikasi
+🔍 Verifikasi QR Code (2 QR: Pimpinan + Sekwan)
+🔔 Notifikasi (WhatsApp)
 👤 Profil
 ```
 
@@ -589,12 +573,13 @@ Pilihan Sekwan:
 
 ```
 ┌────────────────────────────────────────────────────────────┐
-│ ✅ APPROVAL LEVEL 2 - VERIFIKASI ANGGARAN         [✕]    │
+│ ✅ APPROVAL LEVEL 2 - VERIFIKASI ANGGARAN (FINAL) [✕]    │
 ├────────────────────────────────────────────────────────────┤
 │                                                             │
 │ Nomor: 001/KMS-I/06/14/2025                                │
 │ Organisasi: KOMISI-I                                       │
 │ Perihal: Studi Banding Pelayanan Publik Jakarta           │
+│ Status Approval Level 1: ✅ Approved by Pimpinan          │
 │                                                             │
 │ ┌────────────────────────────────────────────────────────┐│
 │ │ 💰 CEK ANGGARAN                                        ││
@@ -655,9 +640,9 @@ Pilihan Sekwan:
 │ │ batalkan penugasan Andi Wijaya agar sesuai anggaran. │  │
 │ └─────────────────────────────────────────────────────┘  │
 │                                                             │
-│ [⬅️ Batal]  [❌ Reject]  [✅ Approve dengan Penyesuaian]  │
+│ [⬅️ Batal]  [❌ Reject]  [✅ Approve FINAL]               │
 │                                                             │
-│ ℹ️ Jika approve, QR Code akan otomatis ter-generate       │
+│ ℹ️ Approve = QR Code Sekwan ter-generate (FINAL APPROVAL) │
 └────────────────────────────────────────────────────────────┘
 ```
 
@@ -675,6 +660,7 @@ Pilihan Sekwan:
 │ Kegiatan: Studi Banding Pelayanan Publik Jakarta                   │
 │ Periode: 20-22 Juni 2025 (3 hari)                                  │
 │ Estimasi SPPD: Rp 5.000.000,- (per orang)                          │
+│ Approval Status: ✅✅ (2/2 - Pimpinan + Sekwan FINAL)              │
 │                                                                      │
 │ ┌──────────────────────────────────────────────────────┐           │
 │ │ 📸 UPLOAD KWITANSI FISIK                             │           │
@@ -779,6 +765,7 @@ Pilihan Sekwan:
 │ │                  │                  │                  │         │
 │ │      3           │      2           │      5           │         │
 │ │   Perlu Generate │   Belum Lengkap  │   Menunggu Review│         │
+│ │   (2 QR Ready)   │                  │                  │         │
 │ └──────────────────┴──────────────────┴──────────────────┘         │
 │                                                                      │
 │ ┌─────────────────────────────────────────────────────────┐        │
@@ -787,17 +774,19 @@ Pilihan Sekwan:
 │ │                                                           │        │
 │ │ 👤 Dr. Budi Santoso - SPPD 001/KMS-I/06/14/2025         │        │
 │ │ Studi Banding Jakarta | Selesai: 22 Jun 2025            │        │
+│ │ Approval: ✅✅ (Pimpinan + Sekwan FINAL)                │        │
 │ │                                                           │        │
 │ │ Status Upload:                                            │        │
 │ │ ✅ Foto Kegiatan: 5 foto (Lengkap)                       │        │
 │ │ ⏰ Kwitansi Fisik: Belum upload                          │        │
 │ │                                                           │        │
-│ │ [👁️ Lihat Foto] [📱 Kirim Reminder]                     │        │
+│ │ [👁️ Lihat Foto] [📱 Kirim Reminder WhatsApp]           │        │
 │ │                                                           │        │
 │ │ ─────────────────────────────────────────────────────── │        │
 │ │                                                           │        │
 │ │ 👤 Siti Nurhaliza - SPPD 001/KMS-I/06/14/2025           │        │
 │ │ Studi Banding Jakarta | Selesai: 22 Jun 2025            │        │
+│ │ Approval: ✅✅ (Pimpinan + Sekwan FINAL)                │        │
 │ │                                                           │        │
 │ │ Status Upload:                                            │        │
 │ │ ✅ Foto Kegiatan: 4 foto (Lengkap)                       │        │
@@ -816,29 +805,30 @@ Pilihan Sekwan:
 
 ---
 
-## 🔐 PERMISSION MATRIX V3.0 FINAL
+## 🔐 PERMISSION MATRIX V2.0 REVISED (TANPA KASUBAG)
 
-| Fitur | Operator | Pimpinan | Sekwan | Kasubag | Pengelola | Pegawai |
-|-------|----------|----------|--------|---------|-----------|---------|
-| **Buat Permohonan** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Edit Permohonan** | ✅ (Jika reject) | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Approve Level 1 + QR** | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **Approve Level 2 + QR** | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
-| **Adjust Jumlah Pegawai** | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
-| **Approve Level 3 + QR** | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ |
-| **Generate Berkas QR** | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
-| **Upload Foto Kegiatan** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| **Upload Kwitansi Fisik** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| **Review Upload Pegawai** | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
-| **Approve Upload** | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
-| **Verifikasi QR Code** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Arsip Digital** | View Own | View All | View All | View All | ✅ | View Own |
+| Fitur | Operator | Pimpinan | Sekwan | Pengelola | Pegawai |
+|-------|----------|----------|--------|-----------|---------|
+| **Buat Permohonan** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Edit Permohonan** | ✅ (Jika reject) | ❌ | ❌ | ❌ | ❌ |
+| **Approve Level 1 + QR** | ❌ | ✅ | ❌ | ❌ | ❌ |
+| **Approve Level 2 + QR (FINAL)** | ❌ | ❌ | ✅ | ❌ | ❌ |
+| **Adjust Jumlah Pegawai** | ❌ | ❌ | ✅ | ❌ | ❌ |
+| **Generate Berkas 2 QR** | ❌ | ❌ | ❌ | ✅ | ❌ |
+| **Upload Foto Kegiatan** | ❌ | ❌ | ❌ | ❌ | ✅ |
+| **Upload Kwitansi Fisik** | ❌ | ❌ | ❌ | ❌ | ✅ |
+| **Review Upload Pegawai** | ❌ | ❌ | ❌ | ✅ | ❌ |
+| **Approve Upload** | ❌ | ❌ | ❌ | ✅ | ❌ |
+| **Verifikasi QR Code** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Arsip Digital** | View Own | View All | View All | ✅ | View Own |
+| **Notifikasi WhatsApp** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Notifikasi In-App** | ❌ | ❌ | ✅ | ❌ | ❌ |
 
 ---
 
 ## 📊 CONTOH KASUS LENGKAP
 
-### **KASUS: Anggaran Tidak Cukup**
+### **KASUS: Anggaran Tidak Cukup - 2 Level Approval**
 
 ```
 PERMOHONAN AWAL:
@@ -851,11 +841,12 @@ PERMOHONAN AWAL:
 
 ALUR:
 1. Operator submit permohonan
-   → Notif ke Pimpinan
+   → WhatsApp ke Pimpinan
 
 2. Pimpinan approve (Level 1)
-   → QR Code ter-generate
-   → Notif ke Sekwan
+   → QR Code Pimpinan ter-generate
+   → WhatsApp ke Sekwan (informasi)
+   → In-App Push ke Sekwan (action required)
 
 3. Sekwan cek anggaran:
    ❌ Tidak cukup!
@@ -868,29 +859,27 @@ ALUR:
    - Estimasi baru: Rp 10.000.000
    - ✅ Anggaran cukup!
    
-   Sekwan APPROVE
-   → QR Code ter-generate
-   → Notif ke:
-      • Kasubag (untuk approval lanjut)
+   Sekwan APPROVE (FINAL!)
+   → QR Code Sekwan ter-generate
+   → WhatsApp ke:
+      • Pengelola (generate dokumen)
       • Andi Wijaya (penugasan dibatalkan)
       • Operator (info penyesuaian)
 
-4. Kasubag approve (Level 3)
-   → QR Code ter-generate
-   → Notif ke Pengelola
-
-5. Pengelola generate dokumen:
+4. Pengelola generate dokumen:
    ST & SPPD untuk 2 orang (Budi + Siti)
-   → Embedded 3 QR Code approval
-   → Notif ke Budi & Siti
+   → Embedded 2 QR Code: [QR Pimpinan] [QR Sekwan]
+   → WhatsApp ke Budi & Siti
 
-6. Budi & Siti:
-   - Download ST & SPPD
+5. Budi & Siti:
+   - Download ST & SPPD (PDF dengan 2 QR Code)
    - Laksanakan perjalanan dinas
    - Upload foto kegiatan
    - Upload kwitansi fisik
 
-7. Pengelola:
+6. Pengelola:
    - Review upload
    - Approve
    - Arsip
+   
+SELESAI - Approval 2 Level (Lebih Cepat!)
